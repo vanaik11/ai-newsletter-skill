@@ -1,0 +1,20 @@
+# Generated newsletter outputs — these are run-time artifacts, not source
+ai-newsletter-*.md
+ai-newsletter-*.html
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# IDE / OS noise
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local-only personal notes
+NOTES.md
+*.local.md
