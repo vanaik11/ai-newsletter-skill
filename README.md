@@ -50,6 +50,8 @@ To verify it loaded, ask Claude in a fresh session: *"list my available skills"*
 
 ## Run it
 
+### Option A — Interactive (any OS)
+
 In any Claude Code session, just say one of:
 
 - *"run my AI newsletter"*
@@ -58,6 +60,42 @@ In any Claude Code session, just say one of:
 - *"use the ai-newsletter skill"*
 
 Output lands in your current project folder as `ai-newsletter-YYYY-MM-DD.md` and `.html`. Open the `.html` in any browser.
+
+### Option B — One-click (Windows)
+
+There's a Windows batch file at [`windows/Run AI Newsletter.bat`](windows/Run%20AI%20Newsletter.bat) that runs the whole thing headlessly and auto-opens the HTML in your browser when done. Useful when your org policy blocks `/schedule` or you just want a desktop shortcut.
+
+**Install:**
+
+```powershell
+# Copy the batch to your Desktop (handles OneDrive Desktop redirection)
+$desktop = [Environment]::GetFolderPath('Desktop')
+Copy-Item .\windows\"Run AI Newsletter.bat" "$desktop\"
+```
+
+**Use:** Double-click `Run AI Newsletter.bat` on your desktop. It opens a console window, runs the skill (~5 min), then opens this week's newsletter in your default browser. Output saves to your real `Documents\AI Newsletter\` folder (correctly handles OneDrive-redirected Documents — common on enterprise machines).
+
+**What it does under the hood:**
+
+1. Auto-detects the latest installed Claude Code version (resilient to self-updates)
+2. Uses `[Environment]::GetFolderPath('MyDocuments')` to find your real Documents folder, not the literal `%USERPROFILE%\Documents` (which is wrong on OneDrive-managed laptops)
+3. Runs `claude -p` with a tight tool whitelist (`WebFetch WebSearch Read Write Bash Glob Grep Edit`) — no shell-of-shells access
+4. Adds `~/.claude/skills/ai-newsletter` as a trusted directory so the bundled Python renderer can run
+5. Opens today's HTML file (or the most recent if today's somehow isn't there)
+
+If anything fails, the console pauses with a clear error message instead of disappearing.
+
+### Option C — Schedule it (Windows)
+
+To get a Monday-morning newsletter without lifting a finger, combine Option B with Windows Task Scheduler:
+
+1. Win+R → `taskschd.msc` → Enter
+2. Action → Create Basic Task
+3. Name: `Weekly AI Newsletter`. Trigger: Weekly, Monday, 8:00 AM
+4. Action: Start a program → Browse to `Run AI Newsletter.bat` on your desktop
+5. Finish
+
+Caveat: your laptop must be powered on at 8am Monday (or the task runs at next login).
 
 Takes ~5 minutes end-to-end depending on how aggressive the parallel web fetches are.
 
