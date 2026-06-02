@@ -19,17 +19,32 @@ Sample output runs roughly 1,500 words. Tone: smart friend over coffee, not pres
 
 ## Install
 
-```powershell
-# Clone the repo somewhere convenient
+Clone the repo, then copy the `ai-newsletter` folder into your Claude Code skills directory.
+
+**macOS / Linux** (bash / zsh):
+
+```bash
 git clone <this-repo-url> ai-newsletter-skill
 cd ai-newsletter-skill
+mkdir -p ~/.claude/skills
+cp -r ai-newsletter ~/.claude/skills/
+```
 
-# Copy the skill folder into your personal skills directory
-# (Windows path shown — adjust for macOS/Linux: ~/.claude/skills/)
+**Windows** (PowerShell):
+
+```powershell
+git clone <this-repo-url> ai-newsletter-skill
+cd ai-newsletter-skill
+if (-not (Test-Path $env:USERPROFILE\.claude\skills)) { New-Item -ItemType Directory -Path $env:USERPROFILE\.claude\skills | Out-Null }
 Copy-Item -Recurse ai-newsletter $env:USERPROFILE\.claude\skills\
 ```
 
-Restart Claude Code (fully quit and reopen). The skill is then available in any project.
+Then **fully quit and reopen Claude Code** so the new session scans the skills directory. The skill is then available in any project on your machine.
+
+### Prerequisites
+
+- **Claude Code** installed and signed in
+- **Python 3.8+** on PATH (the skill calls `python3` on macOS/Linux, `python` on Windows). Verify with `python3 --version` (macOS/Linux) or `python --version` (Windows).
 
 To verify it loaded, ask Claude in a fresh session: *"list my available skills"* — `ai-newsletter` should appear.
 

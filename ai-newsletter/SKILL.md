@@ -101,16 +101,20 @@ Save to `ai-newsletter-{end-date}.md` at the project root. Use this exact struct
 
 ### 5. Render the HTML
 
-Use the bundled renderer — don't roll your own conversion:
+Use the bundled renderer — don't roll your own conversion. The interpreter command differs by OS, so try whichever fits:
 
 ```bash
-python {skill-dir}/scripts/render_html.py \
+# macOS / Linux
+python3 {skill-dir}/scripts/render_html.py \
     ai-newsletter-{end-date}.md \
     {skill-dir}/assets/newsletter.html.template \
     ai-newsletter-{end-date}.html
+
+# Windows
+python {skill-dir}/scripts/render_html.py ai-newsletter-{end-date}.md {skill-dir}/assets/newsletter.html.template ai-newsletter-{end-date}.html
 ```
 
-The script handles the markdown subset this skill produces (headers, bullets, bold, italic, links, hr, paragraphs). If you need a feature it doesn't support (tables, code blocks), extend the script rather than reaching for a pip dependency — keeps the skill self-contained.
+If the first attempt errors with "command not found", fall back to the other (`python` ↔ `python3`). The script needs only the Python standard library (`re`, `sys`, `pathlib`) — no pip deps. It handles the markdown subset this skill produces (headers, bullets, bold, italic, links, hr, paragraphs). If you need a feature it doesn't support (tables, code blocks), extend the script rather than reaching for a pip dependency — keeps the skill self-contained.
 
 ### 6. Tell the user where the file is
 
