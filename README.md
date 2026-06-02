@@ -50,54 +50,46 @@ To verify it loaded, ask Claude in a fresh session: *"list my available skills"*
 
 ## Run it
 
-### Option A — Interactive (any OS)
+### Option A — Interactive (any OS, recommended)
 
-In any Claude Code session, just say one of:
+In any Claude Code session, say one of:
 
-- *"run my AI newsletter"*
+- *"run my AI newsletter, then open the HTML when done"*
 - *"give me this week's AI digest"*
 - *"what's new in AI this week"*
 - *"use the ai-newsletter skill"*
 
-Output lands in your current project folder as `ai-newsletter-YYYY-MM-DD.md` and `.html`. Open the `.html` in any browser.
+Output lands in your current project folder as `ai-newsletter-YYYY-MM-DD.md` and `.html`. Adding *"then open the HTML when done"* asks the agent to launch your default browser at the end — handy on Windows/Mac.
 
-### Option B — One-click (Windows)
+Takes ~5 minutes end-to-end (parallel web fetches across your sources).
 
-There's a Windows batch file at [`windows/Run AI Newsletter.bat`](windows/Run%20AI%20Newsletter.bat) that runs the whole thing headlessly and auto-opens the HTML in your browser when done. Useful when your org policy blocks `/schedule` or you just want a desktop shortcut.
+### Option B — Windows Desktop launcher
+
+A double-click batch at [`windows/AI Newsletter.bat`](windows/AI%20Newsletter.bat) opens Claude Code in your `Documents\AI Newsletter\` folder. You then type the trigger phrase and walk away. This is the "polished manual" workflow — one extra phrase to type, but zero auth complexity.
 
 **Install:**
 
 ```powershell
-# Copy the batch to your Desktop (handles OneDrive Desktop redirection)
 $desktop = [Environment]::GetFolderPath('Desktop')
-Copy-Item .\windows\"Run AI Newsletter.bat" "$desktop\"
+Copy-Item .\windows\"AI Newsletter.bat" "$desktop\"
 ```
 
-**Use:** Double-click `Run AI Newsletter.bat` on your desktop. It opens a console window, runs the skill (~5 min), then opens this week's newsletter in your default browser. Output saves to your real `Documents\AI Newsletter\` folder (correctly handles OneDrive-redirected Documents — common on enterprise machines).
+**Use:** Double-click `AI Newsletter.bat` on your desktop. Claude Code opens in the right folder. Type `run my AI newsletter, then open the HTML when done`. Walk away. Comes back to a newsletter in your browser.
 
-**What it does under the hood:**
+**What it handles for you:**
 
-1. Auto-detects the latest installed Claude Code version (resilient to self-updates)
-2. Uses `[Environment]::GetFolderPath('MyDocuments')` to find your real Documents folder, not the literal `%USERPROFILE%\Documents` (which is wrong on OneDrive-managed laptops)
-3. Runs `claude -p` with a tight tool whitelist (`WebFetch WebSearch Read Write Bash Glob Grep Edit`) — no shell-of-shells access
-4. Adds `~/.claude/skills/ai-newsletter` as a trusted directory so the bundled Python renderer can run
-5. Opens today's HTML file (or the most recent if today's somehow isn't there)
+- Finds the latest installed Claude Code version (resilient to self-updates)
+- Resolves your *real* Documents folder via `[Environment]::GetFolderPath('MyDocuments')` — works correctly on OneDrive-redirected enterprise laptops where `%USERPROFILE%\Documents` is the wrong path
+- Drops you into Claude Code with the correct working directory so output files land where you'd expect
 
-If anything fails, the console pauses with a clear error message instead of disappearing.
+### Option C — Fully headless / scheduled (advanced)
 
-### Option C — Schedule it (Windows)
+Running this fully unattended (no human typing the trigger phrase) requires either:
 
-To get a Monday-morning newsletter without lifting a finger, combine Option B with Windows Task Scheduler:
+1. **An Anthropic API key** at [console.anthropic.com](https://console.anthropic.com) (~$1–2/month at weekly usage). The batch can then call `claude -p --bare` with `ANTHROPIC_API_KEY` set as an env var. Useful if you want Windows Task Scheduler to fire it Monday morning while you're still in bed.
+2. **`/schedule`** (Claude's scheduled remote agents) — only works if your org permits it. Many enterprise installs have `allow_workflows: false` in `policy-limits.json` which blocks this path.
 
-1. Win+R → `taskschd.msc` → Enter
-2. Action → Create Basic Task
-3. Name: `Weekly AI Newsletter`. Trigger: Weekly, Monday, 8:00 AM
-4. Action: Start a program → Browse to `Run AI Newsletter.bat` on your desktop
-5. Finish
-
-Caveat: your laptop must be powered on at 8am Monday (or the task runs at next login).
-
-Takes ~5 minutes end-to-end depending on how aggressive the parallel web fetches are.
+For most personal use, Option A or B is fine and free. Only reach for Option C if you genuinely want zero-touch Monday delivery and are OK with API billing.
 
 ## Customize your sources
 
