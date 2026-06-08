@@ -19,7 +19,22 @@ Sample output runs roughly 1,500 words. Tone: smart friend over coffee, not pres
 
 ## Install
 
-Clone the repo, then copy the `ai-newsletter` folder into your Claude Code skills directory.
+### Windows — one-click installer (recommended for colleagues)
+
+Download [`windows/Setup AI Newsletter.bat`](windows/Setup%20AI%20Newsletter.bat), save it anywhere (Desktop is fine), and **double-click it**. The setup script will:
+
+1. Confirm Claude Code is installed on your machine
+2. Download the latest skill from this repo
+3. Install it to `~/.claude/skills/ai-newsletter/`
+4. Drop an `AI Newsletter.bat` launcher on your Desktop
+
+When it finishes, **fully quit Claude Code** (system tray icon → Quit — *not* just close the window), then double-click the new `AI Newsletter.bat` on your Desktop. Type the trigger phrase when Claude opens. Done. See [Run it](#run-it) below.
+
+Safe to re-run the setup any time to update the skill to the latest version from GitHub.
+
+### Manual install (any OS — clone the repo)
+
+If you'd rather see what's happening or you're on macOS / Linux:
 
 **macOS / Linux** (bash / zsh):
 
