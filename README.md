@@ -107,6 +107,62 @@ A few patterns that work well:
 - For **YouTube**, list channels by their `@handle` so search queries are unambiguous.
 - For **LinkedIn**, write the person's name; the skill uses WebSearch to find press coverage and X mirrors since LinkedIn proper is auth-walled.
 
+## Troubleshooting
+
+The four issues colleagues have actually hit, with fixes.
+
+### Skill doesn't appear in Claude Code
+
+You opened Claude Code before the skill was installed. Fully **quit and reopen** (system tray → Quit on Windows, ⌘Q on macOS — not just close the window). Confirm with: *"list my available skills"* — `ai-newsletter` should appear.
+
+If a restart doesn't fix it, fall back to the manual PowerShell launch below.
+
+### "Not logged in" error from the batch launcher
+
+You're hitting headless mode (`claude -p`), which requires an Anthropic API key on Windows — OAuth tokens don't reach child processes. Use the interactive launcher (Option B above) or the manual PowerShell launch below instead. Both use your existing Claude Code subscription with no API key.
+
+### A newsletter source returned nothing this week
+
+Expected and safe. The skill notes the source as "unavailable" in the output and continues — it never fakes content. If a source stays flaky for two weeks running, edit `SKILL.md` and swap in an alternative.
+
+### LinkedIn coverage feels thin
+
+LinkedIn proper is auth-walled, so the skill uses web search for press coverage and X mirrors. For deeper coverage, add the person's X handle as an additional source in `SKILL.md`.
+
+## Fallback: launch Claude Code manually from PowerShell
+
+If the desktop launcher misbehaves or the skill doesn't appear after a restart, do it by hand. Open PowerShell and paste:
+
+```powershell
+# 1. Find the latest installed Claude Code (resilient to updates)
+$ver = Get-ChildItem "$env:APPDATA\Claude\claude-code" -Directory `
+    | Sort-Object Name -Descending | Select-Object -First 1
+$claude = "$env:APPDATA\Claude\claude-code\$($ver.Name)\claude.exe"
+
+# 2. Open it in your newsletter folder (creates if missing)
+$outdir = Join-Path ([Environment]::GetFolderPath('MyDocuments')) "AI Newsletter"
+if (-not (Test-Path $outdir)) { New-Item -ItemType Directory -Path $outdir | Out-Null }
+Set-Location $outdir
+& $claude
+```
+
+3. **Sign in if Claude prompts you** — at the Claude prompt type `/login` and complete the browser flow. You stay signed in for the session.
+4. **Run the skill** — type `run my AI newsletter, then open the HTML when done`. If the natural-language trigger doesn't fire, try `use the ai-newsletter skill`.
+
+If `SKILL.md` isn't at `~/.claude/skills/ai-newsletter/`, you skipped install step 2 — go back and run the `Copy-Item`.
+
+## Reduce permission prompts (optional)
+
+Claude Code prompts before each tool use by default. To pre-authorize the tools this skill needs, add to `~/.claude/settings.json`:
+
+```json
+"permissions": {
+  "allow": ["WebFetch", "WebSearch", "Read", "Write", "Edit", "Bash", "Glob", "Grep"]
+}
+```
+
+After this, runs proceed silently — no per-tool prompts. Org-level policies (`policy-limits.json`) still override, so this only affects user-controlled permissions.
+
 ## Schedule it (optional)
 
 If your org allows `/schedule` (scheduled remote agents), the procedure is documented in `ai-newsletter/SCHEDULED_PROMPT.md` — paste that into `/schedule` for Monday 8am delivery.
